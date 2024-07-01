@@ -1,0 +1,119 @@
+ In this video, we're going to talk about Lama 2.
+What is Lama 2? How is it trained? How does it compare to GPT variants and chat GPT? And its architecture and code.
+So let's get to it.
+What's important to understand first is that Lama 2 is a suite of pre-trained language models while Lama 2 chat is a fine-tuned chatbot that uses reinforcement learning through human feedback.
+And this is analogous to GPT3, which is a suite of pre-trained language models and chat GPT, which is also a fine-tuned chatbot that has reinforcement learning through human feedback.
+So Lama 2 is comparable to GPT3 and Lama 2 chat is comparable to chat GPT.
+Let's take a look at these individual buzzwords starting with pre-trained and language models.
+With the language model, we take in previous words in order to predict the next word.
+And this is exactly what we want from Lama and GPT.
+And in order to do this, we would feed it hundreds of thousands of examples of input sequences as well as their next token.
+And in this way, we tune the parameters of the model and this training is known as the pre-training.
+And so, we pre-trained an architecture to understand how to perform language modeling.
+Now that we got pre-trained and language model out of the way, let's talk about the fine-tuned chatbot.
+So we have a chatbot.
+And for a chatbot, we'll take an input question and it will deliver a response to that question.
+And this is exactly what we want from Lama 2 chat and chat GPT.
+Now in this case, we are still training the model to understand how to perform question answering, but this training phase is known as fine-tuning.
+Now that we got those two concepts out of the way, let's talk about reinforcement learning through human feedback.
+So let's say now we have this chatbot.
+This chatbot, which is either Lama 2 chat or chat GPT, is already trained to answer questions.
+Now, this chatbot, though, can produce multiple answers for the same question.
+And you can actually see this in action with chat GPT where we ask the same question.
+It gives us multiple answers.
+Now at this point, we want to check which is one of the better answers here.
+And in this case, we would check, let's say, the second one over here.
+And in order to determine which answer is better, we have a group of human reviewers take a look at, well, for this question, of these three answers, which is the best.
+So essentially, we have humans determining the best answer.
+And this is then acted as feedback to the chatbot.
+We're basically saying, hey, we want you chatbot to produce more answers that look like this for this kind of question.
+We quantify this to the chatbot via reinforcement learning.
+And so this entire process is reinforcement learning with human feedback.
+And this chatbot is now tuned to answer questions more like this.
+Now that we kind of tackle all of the major buzzwords here, let's actually go through the entire training overview end to end.
+So first, we have an architecture that's just some untrained model.
+We'll talk about details after this section.
+We then train this model to predict the words that come after the input sequence.
+This is language modeling.
+And we introduce multiple hundreds of thousands of examples so that it truly understands how to model language.
+Now this language model is now Lama 2.
+So Lama 2 is a pre-trained language model.
+Now we take this Lama 2, which is pre-trained on language modeling.
+And then we further train it to answer questions.
+And we feed it in, you know, hundreds of thousands of questions.
+Until eventually, this model becomes Lama 2 chat.
+This model is now fine tuned to answer questions.
+And Lama 2 chat is now made to produce for a single question multiple responses.
+We then have human reviewers determine which is the most appropriate response.
+And then we then make sure that Lama 2 chat understands that, hey, we want you to produce more answers that look like this via reinforcement learning.
+And we again train this on multiple examples.
+And this is how Lama 2 chat becomes safe, helpful, and non-toxic.
+Now that we've taken a look at the overall training overview, let's take a look at the model architecture and its code side by side.
+This here is the approximate model architecture for how Lama 2 looks.
+Now this is a decoder only transformer architecture.
+And what that means is that these are the stack of the decoder part of the transformer neural network.
+And it's in a slightly more simplified form.
+Note like I mentioned, this is an approximate version of Lama, but it is very close.
+The only main difference is that this normalization layer happens a little before the feedforward network and this normalization layer also happens before the attention layer.
+To see this in action, let's actually take a look at the code.
+So this here is the Facebook Research repository for Lama.
+And specifically, this is now updated to be Lama 2 at the time of recording this video.
+And you can see this model architecture is really only just like 300 lines of code.
+We can take a look at the crux of this architecture right here in this transformer block.
+So looking at the forward pass here, you can see that first, we perform some form of normalization followed by attention and then we'll add it to the input.
+And what we saw in this original figure was attention followed by addition and normalization.
+So this normalization actually comes before.
+Next we'll take the output that we received.
+We will again perform normalization, feed forward and then addition.
+Whereas here we perform feed forward addition and normalization.
+So once again, this normalization operation should have come here.
+This is just one transformer block, but the architecture consists of a stack of such blocks.
+And it's preceded by some input embedding layer, which will perform some sort of positional and coatings too.
+You can kind of also see this in the code where we go to this transformer section where we're iterating over the layers of the transformer block.
+And then we want to also perform other operations.
+Now let's now look at the model forward pass.
+So this is the code that will be executed when you want to make a prediction given some input, what is like the next word or token for Lama, because Lama remember is a language model.
+So we first take the input, we'll then try to get its token embeddings.
+This is done by computing the original embeddings of each token that is each word or byte pairing coding and adding it to or applying it to, I should say in this case, to the positional embedding to get this final embedding age for every single byte pairing coding.
+We'll then create a mask.
+This masking is required because over here, you see we're performing massed.
+I had attention.
+This is done so that the decoder cannot cheat, especially during the training time, because it has access to information that comes before and after a current word, but it should not be able to look at the information after that current word.
+And hence we need the mask there.
+With inference, we don't really have that information.
+So we're just adding masking for the sake of uniformity.
+And so we'll add that masking over here in code.
+And we will make sure that the input goes through all of the layers, all the transformer blocks.
+And then we'll perform some no-realization and get the output.
+If you want me to do a much deeper dive on Lama code and also a little more deeper dive on the architecture, do comment down below.
+Let's not compare these Lama architectures with these GPT architectures.
+The first here is that Lama is open source.
+That is we know the code that actually runs the core model for language modeling.
+That is, Momma itself.
+Whereas GPT is more proprietary code and we can only make assumptions of how the model looks and how the code looks.
+Lama is trained on public data, whereas GPT is not.
+Lama has limited GPU requirements for fine tuning, at least in comparison to GPT.
+It's also a smaller architecture with more training data.
+So the Lama suite of architecture is contained between 7 billion parameters to like 70 billion parameters, whereas GPT3 contains with its largest model 175 billion parameters, which is multiple times more than that of Lama.
+However, it is still able to have comparable performance and sometimes even much better performance than GPT3 in multiple places.
+And this is owing to the more training data that it uses.
+I think Lama 2 uses of the order 2 trillion byte parent codings.
+Now owing to its small architecture, we can also say that Lama has a faster inference time than GPT3.
+This is because the architecture is smaller, so there are more operations that need to be done in that forward inference pass.
+And so if you have like a real time production grade system, Lama 2 is faster than GPT3.
+Now where do I start coding if I want to make some inference from these models? So you can go to hugging face repository, they'll be a bunch of these pre-trained Lama models as well as some that are fine tune.
+And they'll give you some code snippets where you can see how you can actually use it in your own projects.
+Now if you want to go a little deeper and fine tune your Lama models, you can use certain tools like Calora, which provides tools for efficiently training models using like CPU and memory constraints.
+And here's the entire code where they're loading data sets, loading their models, and you can create like a little trainer and eventually just start training this model.
+And you can see that over time you will actually be able to train.
+And also push this to hugging face hub once you're done.
+Now this is not my code, but I will link to the YouTube channel that actually created this and provided a good schematic for this code.
+And the link to this will be down in the description below.
+Another really fun tool that I found here is called Auto Train, where you can fine tune any language model or any supported language model.
+And I believe Lama 2 should be supported in this case.
+And they provide this one line code to start fine tuning your Lama models even on your local machine.
+So I'll link to all of these resources down in the description below.
+Now hopefully all of these resources are good for you to understand this wonderful 77 page dissertation on Lama 2.
+And I hope that we were able to demystify Lama 2 for what it is.
+Thank you all so much for watching and I will see you in another video.
+Bye bye.
